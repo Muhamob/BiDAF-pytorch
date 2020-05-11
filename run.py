@@ -51,6 +51,9 @@ def train(args, data):
         batch_loss = criterion(logits, batch.answer.view(-1, 1).type(torch.cuda.FloatTensor))  # criterion(p1, batch.s_idx) + criterion(p2, batch.e_idx)
         loss += batch_loss.item()
         batch_loss.backward()
+
+        nn.utils.clip_grad_norm_(parameters, args.grad_clipping)
+
         optimizer.step()
 
         for name, param in model.named_parameters():
