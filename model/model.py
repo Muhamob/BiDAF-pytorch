@@ -59,10 +59,11 @@ class BiDAF(nn.Module):
                                    dropout=args.dropout)
 
         # 6. Output Layer
-        self.p1_weight_g = Linear(args.hidden_size * 8, 1, dropout=args.dropout)
-        self.p1_weight_m = Linear(args.hidden_size * 2, 1, dropout=args.dropout)
-        self.p2_weight_g = Linear(args.hidden_size * 8, 1, dropout=args.dropout)
-        self.p2_weight_m = Linear(args.hidden_size * 2, 1, dropout=args.dropout)
+        self.classifier = Linear(args.hidden_size * 2, 1, dropout=args.dropout)
+        # self.p1_weight_g = Linear(args.hidden_size * 8, 1, dropout=args.dropout)
+        # self.p1_weight_m = Linear(args.hidden_size * 2, 1, dropout=args.dropout)
+        # self.p2_weight_g = Linear(args.hidden_size * 8, 1, dropout=args.dropout)
+        # self.p2_weight_m = Linear(args.hidden_size * 2, 1, dropout=args.dropout)
 
         self.output_LSTM = LSTM(input_size=args.hidden_size * 2,
                                 hidden_size=args.hidden_size,
@@ -164,14 +165,10 @@ class BiDAF(nn.Module):
             :param m: (batch, c_len ,hidden_size * 2)
             :return: p1: (batch, c_len), p2: (batch, c_len)
             """
-            # (batch, c_len)
-            p1 = (self.p1_weight_g(g) + self.p1_weight_m(m)).squeeze()
-            # (batch, c_len, hidden_size * 2)
-            m2 = self.output_LSTM((m, l))[0]
-            # (batch, c_len)
-            p2 = (self.p2_weight_g(g) + self.p2_weight_m(m2)).squeeze()
+            projection = torch.mean(m, 1)  # (batch, hidden_size * 2)
 
-            return p1, p2
+            logits = self.classifier(projection)
+            return logits
 
         # 1. Character Embedding Layer
         c_char = char_emb_layer(batch.c_char)
@@ -193,7 +190,7 @@ class BiDAF(nn.Module):
         # 5. Modeling Layer
         m = self.modeling_LSTM2((self.modeling_LSTM1((g, c_lens))[0], c_lens))[0]
         # 6. Output Layer
-        p1, p2 = output_layer(g, m, c_lens)
+        logits = output_layer(g, m, c_lens)
 
-        # (batch, c_len), (batch, c_len)
-        return p1, p2
+        # (batch, 1)
+        return logits
