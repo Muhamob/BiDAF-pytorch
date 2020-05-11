@@ -23,7 +23,8 @@ def train(args, data):
         if param.requires_grad:
             ema.register(name, param.data)
     parameters = filter(lambda p: p.requires_grad, model.parameters())
-    optimizer = optim.Adadelta(parameters, lr=args.learning_rate)
+    # optimizer = optim.Adadelta(parameters, lr=args.learning_rate)
+    optimizer = optim.Adamax(parameters, weight_decay=args.weight_decay)
     criterion = nn.BCEWithLogitsLoss()
 
     writer = SummaryWriter(log_dir='runs/' + args.model_time)
