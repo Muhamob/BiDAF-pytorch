@@ -45,6 +45,7 @@ def train(args, data):
         last_epoch = present_epoch
 
         logits = model(batch)
+        print(logits.view(-1))
 
         optimizer.zero_grad()
         batch_loss = criterion(logits, batch.answer.view(-1, 1).type(torch.cuda.FloatTensor))  # criterion(p1, batch.s_idx) + criterion(p2, batch.e_idx)

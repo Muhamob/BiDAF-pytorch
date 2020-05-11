@@ -162,7 +162,7 @@ class BiDAF(nn.Module):
         def output_layer(g, m, l):
             """
             :param g: (batch, c_len, hidden_size * 8)
-            :param m: (batch, c_len ,hidden_size * 2)
+            :param m: (batch, c_len, hidden_size * 2)
             :return: p1: (batch, c_len), p2: (batch, c_len)
             """
             projection = torch.mean(m, 1)  # (batch, hidden_size * 2)
