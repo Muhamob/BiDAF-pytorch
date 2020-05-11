@@ -56,6 +56,7 @@ def train(args, data):
                 ema.update(name, param.data)
 
         if (i + 1) % args.print_freq == 0:
+            print(batch.answer, logits)
             dev_loss, dev_accuracy = test(model, ema, args, data)
             c = (i + 1) // args.print_freq
 
@@ -107,6 +108,7 @@ def test(model, ema, args, data):
         for name, param in model.named_parameters():
             if param.requires_grad:
                 param.data.copy_(backup_params.get(name))
+    print("Количество ответов с меткой True", np.sum(predictions))
 
     return loss, accuracy_score(gt, predictions)
 
