@@ -45,7 +45,6 @@ def train(args, data):
         last_epoch = present_epoch
 
         logits = model(batch)
-        print(logits.view(-1))
 
         optimizer.zero_grad()
         batch_loss = criterion(logits, batch.answer.view(-1, 1).type(torch.cuda.FloatTensor))  # criterion(p1, batch.s_idx) + criterion(p2, batch.e_idx)
@@ -108,7 +107,6 @@ def test(model, ema, args, data):
             probs = torch.sigmoid(logits).data.cpu().numpy()
             predictions.extend(np.where(probs >= 0.5, 1, 0))
             gt.extend(batch.answer)
-
         for name, param in model.named_parameters():
             if param.requires_grad:
                 param.data.copy_(backup_params.get(name))
