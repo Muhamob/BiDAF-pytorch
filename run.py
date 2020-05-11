@@ -46,7 +46,6 @@ def train(args, data):
         logits = model(batch)
 
         optimizer.zero_grad()
-        print(batch.answer.data.cpu().numpy())
         batch_loss = criterion(logits.view(-1), batch.answer.view(-1).type(torch.cuda.FloatTensor))  # criterion(p1, batch.s_idx) + criterion(p2, batch.e_idx)
         loss += batch_loss.item()
         batch_loss.backward()
