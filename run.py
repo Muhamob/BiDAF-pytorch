@@ -46,7 +46,7 @@ def train(args, data):
         logits = model(batch)
 
         optimizer.zero_grad()
-        batch_loss = criterion(logits.view(-1), batch.answer.view(-1).type(torch.cuda.FloatTensor))  # criterion(p1, batch.s_idx) + criterion(p2, batch.e_idx)
+        batch_loss = criterion(logits, batch.answer.view(-1, 1).type(torch.cuda.FloatTensor))  # criterion(p1, batch.s_idx) + criterion(p2, batch.e_idx)
         loss += batch_loss.item()
         batch_loss.backward()
         optimizer.step()
@@ -56,7 +56,6 @@ def train(args, data):
                 ema.update(name, param.data)
 
         if (i + 1) % args.print_freq == 0:
-            print(batch.answer, logits)
             dev_loss, dev_accuracy = test(model, ema, args, data)
             c = (i + 1) // args.print_freq
 
@@ -96,7 +95,7 @@ def test(model, ema, args, data):
     with torch.set_grad_enabled(False):
         for batch in iter(data.dev_iter):
             logits = model(batch)
-            batch_loss = criterion(logits.view(-1), batch.answer.view(-1).type(torch.cuda.FloatTensor))
+            batch_loss = criterion(logits, batch.answer.view(-1, 1).type(torch.cuda.FloatTensor))
             loss += batch_loss.item()
 
             # (batch, c_len, c_len)
