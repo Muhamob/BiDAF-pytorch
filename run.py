@@ -46,7 +46,8 @@ def train(args, data):
         logits = model(batch)
 
         optimizer.zero_grad()
-        batch_loss = criterion(logits, batch.answer)  # criterion(p1, batch.s_idx) + criterion(p2, batch.e_idx)
+        print(batch.answer.data.cpu().numpy())
+        batch_loss = criterion(logits.view(-1), batch.answer)  # criterion(p1, batch.s_idx) + criterion(p2, batch.e_idx)
         loss += batch_loss.item()
         batch_loss.backward()
         optimizer.step()
