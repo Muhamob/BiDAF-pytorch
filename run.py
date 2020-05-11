@@ -47,7 +47,7 @@ def train(args, data):
 
         optimizer.zero_grad()
         print(batch.answer.data.cpu().numpy())
-        batch_loss = criterion(logits.view(-1), batch.answer)  # criterion(p1, batch.s_idx) + criterion(p2, batch.e_idx)
+        batch_loss = criterion(logits.view(-1), torch.FloatTensor(batch.answer.view(-1)))  # criterion(p1, batch.s_idx) + criterion(p2, batch.e_idx)
         loss += batch_loss.item()
         batch_loss.backward()
         optimizer.step()
@@ -96,7 +96,7 @@ def test(model, ema, args, data):
     with torch.set_grad_enabled(False):
         for batch in iter(data.dev_iter):
             logits = model(batch)
-            batch_loss = criterion(logits, batch.answer)
+            batch_loss = criterion(logits.view(-1), torch.FloatTensor(batch.answer.view(-1)))
             loss += batch_loss.item()
 
             # (batch, c_len, c_len)
